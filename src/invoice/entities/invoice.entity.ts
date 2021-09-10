@@ -19,7 +19,7 @@ export class Invoice {
 	@CreateDateColumn()
 	createdAt: Date;
 
-	@CreateDateColumn()
+	@Column()
 	paymentDue: Date;
 
 	@Column()

@@ -1,7 +1,7 @@
 import { Invoice } from 'src/invoice/entities/invoice.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('User')
+@Entity('user')
 export class User {
 	@PrimaryGeneratedColumn()
 	id: number;

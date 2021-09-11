@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Invoice } from './invoice.entity';
 
-@Entity('Item')
+@Entity('item')
 export class Item {
 	@PrimaryGeneratedColumn()
 	id: string;
@@ -18,6 +18,9 @@ export class Item {
 	@Column()
 	total: number;
 
-	@ManyToOne(() => Invoice, (invoice) => invoice.items)
+	@ManyToOne(() => Invoice, (invoice) => invoice.items, {
+		cascade: ['remove'],
+		onDelete: 'CASCADE',
+	})
 	invoice: Invoice;
 }

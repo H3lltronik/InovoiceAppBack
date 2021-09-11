@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
@@ -16,14 +17,16 @@ export class InvoiceService {
 		private invoiceRepository: Repository<Invoice>,
 		@InjectRepository(Item)
 		private itemRepository: Repository<Item>,
+		@InjectRepository(User)
+		private userRepository: Repository<User>,
 	) {}
 
-	create(createInvoiceDto: CreateInvoiceDto) {
+	async create(createInvoiceDto: CreateInvoiceDto): Promise<Invoice> {
 		const senderAddress = this.addressRepository.create({
-			...createInvoiceDto,
+			...createInvoiceDto.senderAddress,
 		});
 		const clientAddress = this.addressRepository.create({
-			...createInvoiceDto,
+			...createInvoiceDto.clientAddress,
 		});
 
 		const items = [];
@@ -31,22 +34,21 @@ export class InvoiceService {
 			items.push(this.itemRepository.create({ ...item }));
 		});
 
+		const user = await this.userRepository.findOne(1);
+
 		const invoice = this.invoiceRepository.create({
-			paymentDue: createInvoiceDto.paymentDue,
-			description: createInvoiceDto.description,
-			paymentTerms: createInvoiceDto.paymentTerms,
-			clientName: createInvoiceDto.clientName,
-			clientEmail: createInvoiceDto.clientEmail,
-			status: createInvoiceDto.status,
-			senderAddress: createInvoiceDto.senderAddress,
-			clientAddress: createInvoiceDto.clientAddress,
-			items: createInvoiceDto.items,
-			total: createInvoiceDto.total,
+			...createInvoiceDto,
+			clientAddress,
+			senderAddress,
+			items,
+			user,
 		});
+
+		return await this.invoiceRepository.save(invoice);
 	}
 
-	findAll() {
-		return `This action returns all invoice`;
+	findAll(): Promise<Invoice[]> {
+		return this.invoiceRepository.find();
 	}
 
 	findOne(id: number) {
@@ -57,7 +59,11 @@ export class InvoiceService {
 		return `This action updates a #${id} invoice`;
 	}
 
-	remove(id: number) {
-		return `This action removes a #${id} invoice`;
+	async remove(id: number): Promise<Invoice> {
+		const invoice = await this.invoiceRepository.find();
+		if (!invoice)
+			throw new HttpException('Invoice not found', HttpStatus.NOT_FOUND);
+
+		return await this.invoiceRepository.remove(invoice[0]);
 	}
 }

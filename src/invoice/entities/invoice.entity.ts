@@ -3,6 +3,7 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	JoinColumn,
 	ManyToOne,
 	OneToMany,
 	OneToOne,
@@ -11,7 +12,7 @@ import {
 import { Address } from './address.entity';
 import { Item } from './item.entity';
 
-@Entity('Invoice')
+@Entity('invoice')
 export class Invoice {
 	@PrimaryGeneratedColumn()
 	id: string;
@@ -37,13 +38,27 @@ export class Invoice {
 	@Column()
 	status: string;
 
-	@OneToOne(() => Address)
+	@OneToOne(() => Address, (senderAddress) => senderAddress.invoice, {
+		cascade: true,
+		onDelete: 'CASCADE',
+		eager: true,
+	})
+	@JoinColumn()
 	senderAddress: Address;
 
-	@OneToOne(() => Address)
+	@OneToOne(() => Address, (clientAddress) => clientAddress.invoice, {
+		cascade: true,
+		onDelete: 'CASCADE',
+		eager: true,
+	})
+	@JoinColumn()
 	clientAddress: Address;
 
-	@OneToMany(() => Item, (item) => item.invoice)
+	@OneToMany(() => Item, (item) => item.invoice, {
+		cascade: ['insert'],
+		eager: true,
+	})
+	@JoinColumn()
 	items: Item[];
 
 	@Column()

@@ -1,19 +1,29 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	Entity,
+	JoinColumn,
+	OneToOne,
+	PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Invoice } from './invoice.entity';
 
-@Entity('Address')
+@Entity('address')
 export class Address {
 	@PrimaryGeneratedColumn()
 	id: string;
 
 	@Column()
-	name: string;
+	street: string;
 
 	@Column()
-	quantity: number;
+	city: string;
 
 	@Column()
-	price: number;
+	postCode: string;
 
 	@Column()
-	total: number;
+	country: string;
+
+	@OneToOne(() => Invoice)
+	invoice: Invoice;
 }

@@ -60,10 +60,13 @@ export class InvoiceService {
 	}
 
 	async remove(id: number): Promise<Invoice> {
-		const invoice = await this.invoiceRepository.find();
+		const invoice = await this.invoiceRepository.findOne(id);
 		if (!invoice)
 			throw new HttpException('Invoice not found', HttpStatus.NOT_FOUND);
 
-		return await this.invoiceRepository.remove(invoice[0]);
+		const deleted = await this.invoiceRepository.remove(invoice);
+		await this.addressRepository.remove(deleted.clientAddress);
+		await this.addressRepository.remove(deleted.senderAddress);
+		return deleted;
 	}
 }

@@ -23,13 +23,13 @@ export class UserController {
 		return this.userService.create(createDto);
 	}
 
-	@Post('login')
-	login(@Body() loginDto: LoginUserDto) {
-		return this.userService.validateUser(
-			loginDto.username,
-			loginDto.password,
-		);
-	}
+	// @Post('login')
+	// login(@Body() loginDto: LoginUserDto) {
+	// 	return this.userService.validateUser(
+	// 		loginDto.username,
+	// 		loginDto.password,
+	// 	);
+	// }
 
 	@Post('profile-picture')
 	@UseInterceptors(FileInterceptor('file'))

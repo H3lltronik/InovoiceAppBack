@@ -26,6 +26,7 @@ export class UserService {
 			return await this.userRepository.save(user);
 		} catch (error) {
 			if (error instanceof QueryFailedError) {
+				console.log(error);
 				throw new HttpException(
 					'Username already exists',
 					HttpStatus.CONFLICT,
@@ -57,18 +58,20 @@ export class UserService {
 		return this.userRepository.save(user);
 	}
 
-	async validateUser(username: string, password: string) {
-		const user = await this.userRepository.findOneOrFail({
+	async findOneByUsername(username: string): Promise<User> {
+		const user = await this.userRepository.findOne({
 			where: { username },
 		});
+		if (!user)
+			throw new HttpException('Wrong credentials', HttpStatus.NOT_FOUND);
+		return user;
+	}
 
-		const isPswdOk = await bcrypt.compare(password, user.password);
+	async addRegisterToken(id: number, refreshToken: string) {
+		const user = await this.userRepository.findOne(id);
+		user.refreshToken = refreshToken;
 
-		if (user && isPswdOk) {
-			const { password, ...rest } = user;
-			return rest;
-		}
-
-		throw new HttpException('Wrong credentials', HttpStatus.NOT_FOUND);
+		await this.userRepository.save(user);
+		return user;
 	}
 }

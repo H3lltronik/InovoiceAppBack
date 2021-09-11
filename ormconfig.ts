@@ -8,7 +8,6 @@ const config: MysqlConnectionOptions = {
 	password: '',
 	database: 'invoices-app',
 	synchronize: true,
-	logging: true,
 	entities: ['dist/src/**/*.entity.js'],
 	migrations: ['dist/src/db/migrations/*.js'],
 	cli: {

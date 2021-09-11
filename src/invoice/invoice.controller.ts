@@ -6,10 +6,12 @@ import {
 	Patch,
 	Param,
 	Delete,
+	UseGuards,
 } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('invoice')
 export class InvoiceController {
@@ -20,6 +22,7 @@ export class InvoiceController {
 		return this.invoiceService.create(createInvoiceDto);
 	}
 
+	@UseGuards(AuthGuard('jwt'))
 	@Get()
 	findAll() {
 		return this.invoiceService.findAll();

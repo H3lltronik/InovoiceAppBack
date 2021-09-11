@@ -67,7 +67,7 @@ export class UserService {
 		return user;
 	}
 
-	async addRegisterToken(id: number, refreshToken: string) {
+	async addRefreshToken(id: number, refreshToken: string) {
 		const user = await this.userRepository.findOne(id);
 		user.refreshToken = refreshToken;
 

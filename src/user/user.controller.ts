@@ -8,6 +8,7 @@ import {
 	ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ProfilePicStorage } from 'src/common/profilePicStorage';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -31,12 +32,21 @@ export class UserController {
 	// 	);
 	// }
 
-	@Post('profile-picture')
-	@UseInterceptors(FileInterceptor('file'))
-	profilePicture(@UploadedFile() file: Express.Multer.File) {}
-
 	@Post('change-password')
 	changePassword(@Body() updateDto: UpdateUserDto) {
 		return this.userService.update(1, updateDto);
+	}
+
+	@Post('profile-picture')
+	@UseInterceptors(FileInterceptor('file', ProfilePicStorage.configuration()))
+	async uploadFile(@UploadedFile() file: Express.Multer.File, @Body() body) {
+		const cleanedPath = file.path.substring(
+			'public/'.length,
+			file.path.length,
+		);
+		return await this.userService.setProfilePicture(
+			body.userId,
+			cleanedPath,
+		);
 	}
 }

@@ -1,11 +1,16 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, ValidateNested } from 'class-validator';
+import {
+	IsDate,
+	IsDateString,
+	IsNotEmpty,
+	ValidateNested,
+} from 'class-validator';
 import { Address } from '../entities/address.entity';
 import { Item } from '../entities/item.entity';
 
 export class CreateInvoiceDto {
 	@IsNotEmpty()
-	@IsDate()
+	@IsDateString()
 	paymentDue: Date;
 
 	@IsNotEmpty()
@@ -38,6 +43,5 @@ export class CreateInvoiceDto {
 	@Type(() => Item)
 	items: Item[];
 
-	@IsNotEmpty()
 	total: number;
 }

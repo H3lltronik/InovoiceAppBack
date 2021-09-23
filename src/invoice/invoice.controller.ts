@@ -7,6 +7,8 @@ import {
 	Param,
 	Delete,
 	UseGuards,
+	UsePipes,
+	ValidationPipe,
 } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
@@ -18,6 +20,7 @@ export class InvoiceController {
 	constructor(private readonly invoiceService: InvoiceService) {}
 
 	@Post()
+	@UsePipes(ValidationPipe)
 	create(@Body() createInvoiceDto: CreateInvoiceDto) {
 		return this.invoiceService.create(createInvoiceDto);
 	}
@@ -34,6 +37,7 @@ export class InvoiceController {
 	}
 
 	@Patch(':id')
+	@UsePipes(ValidationPipe)
 	update(
 		@Param('id') id: string,
 		@Body() updateInvoiceDto: UpdateInvoiceDto,

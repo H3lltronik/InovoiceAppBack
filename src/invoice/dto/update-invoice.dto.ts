@@ -2,12 +2,18 @@ import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/mapped-types';
 import { Address } from '../entities/address.entity';
 import { CreateInvoiceDto } from './create-invoice.dto';
-import { IsDate, IsNotEmpty, ValidateNested } from 'class-validator';
+import {
+	IsDate,
+	IsDateString,
+	IsDefined,
+	IsNotEmpty,
+	ValidateNested,
+} from 'class-validator';
 import { Item } from '../entities/item.entity';
 
 export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {
 	@IsNotEmpty()
-	@IsDate()
+	@IsDateString()
 	paymentDue: Date;
 
 	@IsNotEmpty()
@@ -23,6 +29,7 @@ export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {
 	clientEmail: string;
 
 	@IsNotEmpty()
+	@IsDefined()
 	status: string;
 
 	@IsNotEmpty()
@@ -40,7 +47,6 @@ export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {
 	@Type(() => Item)
 	items: Item[];
 
-	@IsNotEmpty()
 	total: number;
 }
 

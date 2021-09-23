@@ -67,9 +67,25 @@ export class UserService {
 		return user;
 	}
 
-	async addRefreshToken(id: number, refreshToken: string) {
+	async findOne(id: number) {
 		const user = await this.userRepository.findOne(id);
+		if (!user) {
+			throw new HttpException('', HttpStatus.NOT_FOUND);
+		}
+		return user;
+	}
+
+	async addRefreshToken(id: number, refreshToken: string | null) {
+		const user = await this.findOne(id);
 		user.refreshToken = refreshToken;
+
+		await this.userRepository.save(user);
+		return user;
+	}
+	async setProfilePicture(id: number, url: string) {
+		const user = await this.findOne(id);
+
+		user.profilePicture = url;
 
 		await this.userRepository.save(user);
 		return user;

@@ -30,9 +30,13 @@ export class InvoiceService {
 		});
 
 		const items = [];
+		let invoiceTotal = 0;
 		createInvoiceDto.items.forEach((item) => {
+			item.total = item.quantity * item.price;
+			invoiceTotal += item.total;
 			items.push(this.itemRepository.create({ ...item }));
 		});
+		createInvoiceDto.total = invoiceTotal;
 
 		const user = await this.userRepository.findOne(1);
 
@@ -51,12 +55,31 @@ export class InvoiceService {
 		return this.invoiceRepository.find();
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} invoice`;
+	async findOne(id: number) {
+		return await this.invoiceRepository.findOne(id);
 	}
 
-	update(id: number, updateInvoiceDto: UpdateInvoiceDto) {
-		return `This action updates a #${id} invoice`;
+	async update(id: number, updateInvoiceDto: UpdateInvoiceDto) {
+		const invoice = await this.invoiceRepository.findOne(id);
+		if (!invoice)
+			throw new HttpException('Invoice not found', HttpStatus.NOT_FOUND);
+
+		const { clientAddress, senderAddress, items, ...invoiceData } =
+			updateInvoiceDto;
+
+		await this.addressRepository.update(clientAddress.id, clientAddress);
+		await this.addressRepository.update(senderAddress.id, senderAddress);
+
+		let invoiceTotal = 0;
+		items.forEach(async (item) => {
+			item.total = item.quantity * item.price;
+			invoiceTotal += item.total;
+			await this.itemRepository.update(item.id, item);
+		});
+
+		invoiceData.total = invoiceTotal;
+
+		return await this.invoiceRepository.update(id, invoiceData);
 	}
 
 	async remove(id: number): Promise<Invoice> {

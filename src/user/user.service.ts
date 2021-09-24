@@ -5,6 +5,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { destinationString } from 'src/common/profilePicStorage';
+const fs = require('fs');
 
 @Injectable()
 export class UserService {
@@ -85,9 +87,17 @@ export class UserService {
 	async setProfilePicture(id: number, url: string) {
 		const user = await this.findOne(id);
 
-		user.profilePicture = url;
+		//Delete old one
+		try {
+			const profileFullPath = `./public/${user.profilePicture}`;
+			if (user.profilePicture && fs.existsSync(profileFullPath)) {
+				fs.rmSync(profileFullPath);
+			}
+		} finally {
+			user.profilePicture = url;
+			await this.userRepository.save(user);
+		}
 
-		await this.userRepository.save(user);
 		return user;
 	}
 }

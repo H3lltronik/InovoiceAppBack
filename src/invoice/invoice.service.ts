@@ -21,7 +21,12 @@ export class InvoiceService {
 		private userRepository: Repository<User>,
 	) {}
 
-	async create(createInvoiceDto: CreateInvoiceDto): Promise<Invoice> {
+	async create(
+		userId: string,
+		createInvoiceDto: CreateInvoiceDto,
+	): Promise<Invoice> {
+		const user = await this.userRepository.findOneOrFail(userId);
+
 		const senderAddress = this.addressRepository.create({
 			...createInvoiceDto.senderAddress,
 		});
@@ -38,8 +43,6 @@ export class InvoiceService {
 		});
 		createInvoiceDto.total = invoiceTotal;
 
-		const user = await this.userRepository.findOne(1);
-
 		const invoice = this.invoiceRepository.create({
 			...createInvoiceDto,
 			clientAddress,
@@ -51,8 +54,14 @@ export class InvoiceService {
 		return await this.invoiceRepository.save(invoice);
 	}
 
-	findAll(): Promise<Invoice[]> {
-		return this.invoiceRepository.find();
+	async findAll(userId: string): Promise<Invoice[]> {
+		const user = await this.userRepository.findOneOrFail(userId);
+		const invoices = await this.invoiceRepository.find({
+			where: {
+				user,
+			},
+		});
+		return invoices;
 	}
 
 	async findOne(id: number) {

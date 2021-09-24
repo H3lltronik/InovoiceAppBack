@@ -15,7 +15,7 @@ export class UserService {
 		private userRepository: Repository<User>,
 	) {}
 
-	async create(dto: CreateUserDto): Promise<User> {
+	async create(dto: CreateUserDto) {
 		const salt = await bcrypt.genSalt(10);
 		const hashedPass = await bcrypt.hash(dto.password, salt);
 
@@ -24,8 +24,10 @@ export class UserService {
 			password: hashedPass,
 		});
 
+		const { password, ...savedUser } = await this.userRepository.save(user);
+
 		try {
-			return await this.userRepository.save(user);
+			return savedUser;
 		} catch (error) {
 			if (error instanceof QueryFailedError) {
 				console.log(error);

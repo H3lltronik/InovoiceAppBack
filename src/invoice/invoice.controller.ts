@@ -9,6 +9,7 @@ import {
 	UseGuards,
 	UsePipes,
 	ValidationPipe,
+	Req,
 } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
@@ -20,25 +21,29 @@ export class InvoiceController {
 	constructor(private readonly invoiceService: InvoiceService) {}
 
 	@Post()
+	@UseGuards(AuthGuard('jwt'))
 	@UsePipes(ValidationPipe)
-	create(@Body() createInvoiceDto: CreateInvoiceDto) {
-		return this.invoiceService.create(createInvoiceDto);
+	create(@Req() req, @Body() createInvoiceDto: CreateInvoiceDto) {
+		return this.invoiceService.create(req.user.id, createInvoiceDto);
 	}
 
-	@UseGuards(AuthGuard('jwt'))
 	@Get()
-	findAll() {
-		return this.invoiceService.findAll();
+	@UseGuards(AuthGuard('jwt'))
+	findAll(@Req() req) {
+		return this.invoiceService.findAll(req.user.id);
 	}
 
 	@Get(':id')
-	findOne(@Param('id') id: string) {
+	@UseGuards(AuthGuard('jwt'))
+	findOne(@Req() req, @Param('id') id: string) {
 		return this.invoiceService.findOne(+id);
 	}
 
 	@Patch(':id')
+	@UseGuards(AuthGuard('jwt'))
 	@UsePipes(ValidationPipe)
 	update(
+		@Req() req,
 		@Param('id') id: string,
 		@Body() updateInvoiceDto: UpdateInvoiceDto,
 	) {
@@ -46,6 +51,7 @@ export class InvoiceController {
 	}
 
 	@Delete(':id')
+	@UseGuards(AuthGuard('jwt'))
 	remove(@Param('id') id: string) {
 		return this.invoiceService.remove(+id);
 	}

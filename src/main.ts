@@ -9,7 +9,11 @@ async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
 	app.use(cookieParser());
-	app.useStaticAssets(join(__dirname, '..', '..', 'public'));
+	app.useStaticAssets(join(__dirname, '..', '..', 'public'), {
+		setHeaders: (res, path, stat) => {
+			res.set('Access-Control-Allow-Origin', '*');
+		},
+	});
 	app.enableCors({
 		origin: 'http://192.168.100.3:3000',
 		credentials: true,

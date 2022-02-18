@@ -6,10 +6,11 @@ const config: MysqlConnectionOptions = {
 	port: 3306,
 	username: 'root',
 	password: '',
-	database: 'invoices-app',
-	synchronize: true,
+	database: 'test',
+	synchronize: false,
 	entities: ['dist/src/**/*.entity.js'],
 	migrations: ['dist/src/db/migrations/*.js'],
+	logging: false,
 	cli: {
 		migrationsDir: 'src/db/migrations',
 	},
